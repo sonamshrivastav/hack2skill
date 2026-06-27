@@ -138,12 +138,26 @@ export default function Auth({ onAuthSuccess }) {
     // Validations
     if (!signUpName.trim()) return setError('Please enter your name.');
     if (!signUpEmail.trim()) return setError('Please enter your email.');
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(signUpEmail.trim())) {
+      return setError('Please enter a valid email address (e.g. student@example.com).');
+    }
+    
     if (!signUpPassword.trim()) return setError('Please choose a secure password.');
+    if (signUpPassword.length < 6) {
+      return setError('Password must be at least 6 characters long.');
+    }
     if (signUpPassword !== signUpConfirm) return setError('Passwords do not match.');
     if (!selectedExam) return setError('Please select your target competitive exam.');
     if (!examDate) return setError('Please select your target exam date.');
     if (!emergencyName.trim()) return setError('Please enter an emergency contact name.');
     if (!emergencyPhone.trim()) return setError('Please enter emergency contact phone details.');
+    
+    const phoneRegex = /^[+]?[0-9\s\-()]{8,20}$/;
+    if (!phoneRegex.test(emergencyPhone.trim())) {
+      return setError('Please enter a valid emergency contact phone details (at least 8 digits).');
+    }
 
     const db = getUsersDB();
     const emailExists = db.some(

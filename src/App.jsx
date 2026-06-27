@@ -70,7 +70,10 @@ export default function App() {
       setChatLog(storedChat ? JSON.parse(storedChat) : []);
       setWeeklyReports(storedWeekly ? JSON.parse(storedWeekly) : null);
     } catch (e) {
-      console.error('Failed to load user transaction databases:', e);
+      // Fallback resets to empty scopes on LocalStorage corruption
+      setLogs([]);
+      setChatLog([]);
+      setWeeklyReports(null);
     }
   }, [currentUser]);
 

@@ -48,100 +48,82 @@ export function simulateJournalAnalysis(text, examName = 'Exams') {
   }
 
   // Sentiment boosts
-  if (normalized.includes('confident') || normalized.includes('clear') || normalized.includes('ready') || normalized.includes('solve')) {
-    confidence += 20;
-    motivation += 15;
-    focus += 10;
+  if (normalized.includes('confident') || normalized.includes('happy') || normalized.includes('good') || normalized.includes('pacing') || normalized.includes('calm')) {
     stressScore -= 15;
-    primaryEmotions.push('Optimism');
-    positiveHabits.push('Self-affirmation practice');
+    confidence += 15;
+    motivation += 10;
+    focus += 10;
+    primaryEmotions.push('Optimistic');
+    positiveHabits.push('Cognitive thought reframing');
   }
-  if (normalized.includes('scared') || normalized.includes('fail') || normalized.includes('hopeless') || normalized.includes('give up')) {
-    confidence -= 25;
-    motivation -= 25;
-    stressScore += 20;
-    primaryEmotions.push('Self-Doubt');
+  if (normalized.includes('rest') || normalized.includes('relax') || normalized.includes('break') || normalized.includes('walk') || normalized.includes('meditate')) {
+    stressScore -= 10;
+    focus += 15;
+    positiveHabits.push('Structured downtime scheduling');
   }
 
-  // Bounds clamping
-  stressScore = Math.max(10, Math.min(stressScore, 98));
-  confidence = Math.max(10, Math.min(confidence, 98));
-  motivation = Math.max(10, Math.min(motivation, 98));
-  focus = Math.max(10, Math.min(focus, 98));
+  // Clamp ratings to correct wellness standard boundaries
+  stressScore = Math.max(10, Math.min(98, stressScore));
+  confidence = Math.max(10, Math.min(98, confidence));
+  motivation = Math.max(10, Math.min(98, motivation));
+  focus = Math.max(10, Math.min(98, focus));
 
-  // Secondary emotion selection
-  let primary = primaryEmotions[0] || (stressScore > 65 ? 'Anxiety' : stressScore > 40 ? 'Overwhelm' : 'Calm');
-  let secondary = stressScore > 75 ? 'Fatigue' : stressScore > 45 ? 'Self-Doubt' : 'Hopeful';
+  // Determine core emotions
+  if (primaryEmotions.length === 0) {
+    if (stressScore > 70) {
+      primaryEmotions.push('Overwhelmed');
+    } else if (stressScore > 45) {
+      primaryEmotions.push('Anxious');
+    } else {
+      primaryEmotions.push('Steady');
+    }
+  }
+  const secondaryEmotion = stressScore > 60 ? 'Tired' : 'Hopeful';
 
-  // Burnout risk
   let burnoutRisk = 'low';
   if (stressScore > 75) burnoutRisk = 'high';
   else if (stressScore > 45) burnoutRisk = 'medium';
 
-  // Anxiety level
   let anxietyLevel = 'low';
   if (stressScore > 70) anxietyLevel = 'high';
   else if (stressScore > 40) anxietyLevel = 'medium';
 
-  // Emotional stability
-  let emotionalStability = 'stable';
-  if (stressScore > 75) emotionalStability = 'unstable';
-  else if (stressScore > 45) emotionalStability = 'fluctuating';
-
-  // Wellness score
-  let wellnessScore = Math.round(100 - (stressScore * 0.7) + (confidence * 0.15) + (focus * 0.15));
-  wellnessScore = Math.max(10, Math.min(wellnessScore, 98));
-
-  // Defaults fallback
-  if (triggers.length === 0) triggers.push('Syllabus Revision Loading');
-  if (positiveHabits.length === 0) positiveHabits.push('Maintaining regular journals');
-  if (negativeHabits.length === 0) negativeHabits.push('Slightly irregular rest boundaries');
-
-  // Sleep and study observations
-  const sleepObservations = normalized.includes('sleep') || normalized.includes('tired')
-    ? 'Exhaustion noted in logs. Late-night focus is compromising REM recovery.'
-    : 'Sleep observations seem relatively stable, though mental recovery checks are advised.';
-    
-  const studyObservations = normalized.includes('mock') || normalized.includes('syllabus')
-    ? 'Student is actively addressing mock test schedules, though backlog anxiety drops focus.'
-    : 'Study pacing is progressing, maintaining consistent Pomodoro cycles.';
-
-  // Coping strategies
-  const copingStrategies = [];
-  if (stressScore > 75) {
-    copingStrategies.push('Enforce an immediate 15-minute complete digital cutoff');
-    copingStrategies.push('Perform a 4-4-4-4 box breathing cycle for 2 minutes');
-  } else {
-    copingStrategies.push('Break the next concept card into a 25-minute Pomodoro slot');
+  // Construct observations summaries
+  let sleepObs = "Rest cycles seem stable. Keep prioritizing night sleep.";
+  if (triggers.includes('Sleep Deficit & Exhaustion')) {
+    sleepObs = "Exhaustion keywords detected. Late night cramming reduces recall speed.";
   }
-  copingStrategies.push('Avoid relative peer comparisons; track personal metrics only');
-  copingStrategies.push('Review incorrect questions in mock tests without looking at the score');
 
-  const summary = `Preparation status is currently in the ${burnoutRisk === 'high' ? 'critical overload warning' : burnoutRisk === 'medium' ? 'mild adjustment needed' : 'stable balanced'} zone.`;
+  let studyObs = `Pacing targets are configured for competitive ${examName} prep.`;
+  if (triggers.includes('Syllabus Coverage Backlog')) {
+    studyObs = "Syllabus backlog anxiety noted. Break syllabus chapters into 30-min sprints.";
+  }
 
-  const motivationalMessage = stressScore > 75
-    ? `Take a deep breath. You are running a marathon for ${examName}. Slowing down for a moment to rest will actually speed up your long-term memory. We believe in you.`
-    : `Excellent persistence. Pacing your study sessions systematically is how you climb this mountain. Keep going!`;
+  const coping = [
+    "Introduce a 10-minute active downtime walk after 2 hours of study",
+    "Practice Box Breathing for 2 cycles when mock test tension rises",
+    "Commit optional chapters or backlogs to a dedicated secondary list"
+  ];
 
   return {
-    primaryEmotion: primary,
-    secondaryEmotion: secondary,
+    primaryEmotion: primaryEmotions[0],
+    secondaryEmotion,
     stressScore,
     burnoutRisk,
     anxietyLevel,
     confidence,
     motivation,
     focus,
-    emotionalStability,
-    positiveHabits,
-    negativeHabits,
-    hiddenStressTriggers: triggers,
-    sleepObservations,
-    studyObservations,
-    copingStrategies,
-    motivationalMessage,
-    wellnessScore,
-    summary
+    emotionalStability: stressScore > 75 ? 'fluctuating' : 'stable',
+    positiveHabits: positiveHabits.length > 0 ? positiveHabits : ['Active revision tracking'],
+    negativeHabits: negativeHabits.length > 0 ? negativeHabits : ['Peer score comparisons'],
+    hiddenStressTriggers: triggers.length > 0 ? triggers : ['General Syllabus Burden'],
+    sleepObservations: sleepObs,
+    studyObservations: studyObs,
+    copingStrategies: coping,
+    motivationalMessage: `Preparation for ${examName} is about persistence. A single day's backlog doesn't define your capability. Paces yourself!`,
+    wellnessScore: Math.round((confidence + motivation + focus) / 3),
+    summary: `Student displays ${burnoutRisk} risk patterns. Syllabus load triggers mild anxiety. Maintain structured rest intervals.`
   };
 }
 
@@ -154,207 +136,173 @@ export function simulateStressPatterns(logs, currentLog = null, examName = 'Exam
       patterns: [
         {
           title: 'Collecting Profile Baselines',
-          description: 'Aura is waiting for daily journal entries to analyze stress fluctuations.',
+          description: 'Aura is gathering baseline stress patterns. Keep updating your daily log details.',
           severity: 'low'
         }
       ],
-      correlation: 'Requires logs to map stress correlations.',
-      recommendations: ['Perform reflections after mocks and mock reviews.']
+      correlation: 'Static profile checks.',
+      recommendations: [
+        'Complete at least two reflections to map comparisons',
+        'Reference mock test anxiety triggers in your text'
+      ]
     };
   }
 
-  const patterns = [];
-  const recommendations = [];
-
-  let totalStress = 0;
-  let mockTrigCount = 0;
-  let peerTrigCount = 0;
-  let sleepTrigCount = 0;
-  let lateNightCount = 0;
-
-  logs.forEach(log => {
-    const analysis = log.analysis || {};
-    totalStress += (analysis.stressScore || 40);
-
-    const trigs = analysis.hiddenStressTriggers || [];
-    if (trigs.some(t => t.includes('Mock') || t.includes('Performance'))) mockTrigCount++;
-    if (trigs.some(t => t.includes('Peer') || t.includes('Comparison'))) peerTrigCount++;
-    if (trigs.some(t => t.includes('Sleep') || t.includes('Exhaustion'))) sleepTrigCount++;
-    
-    if (log.timestamp) {
-      const hrs = new Date(log.timestamp).getHours();
-      if (hrs >= 22 || hrs <= 4) lateNightCount++;
-    }
-  });
-
-  const avgStress = Math.round(totalStress / logs.length);
-
-  // Compare current entry with past entries if currentLog exists
-  if (currentLog && logs.length > 1) {
-    const prevLogs = logs.filter(l => l.id !== currentLog.id);
-    if (prevLogs.length > 0) {
-      const prevAvg = prevLogs.reduce((acc, curr) => acc + (curr.analysis?.stressScore || 40), 0) / prevLogs.length;
-      const currentStress = currentLog.analysis?.stressScore || 40;
-      const diff = Math.round(currentStress - prevAvg);
-
-      if (diff > 15) {
-        patterns.push({
-          title: 'Acute Stress Escalation Detected',
-          description: `Your stress rating today is ${diff}% higher than your historical baseline. Take action to decompress.`,
-          severity: 'high'
-        });
-      } else if (diff < -15) {
-        patterns.push({
-          title: 'Stress Levels Decreased',
-          description: `Excellent work! Your current stress level has decreased by ${Math.abs(diff)}% relative to your recent averages.`,
+  const curLog = currentLog || logs[0];
+  const curStress = curLog.analysis?.stressScore || 40;
+  
+  // Calculate average of previous logs
+  const history = logs.filter(l => l.id !== curLog.id);
+  if (history.length === 0) {
+    return {
+      patterns: [
+        {
+          title: 'Initial Comparison Point Captured',
+          description: `First check-in stress is ${curStress}/100. Aura will monitor delta changes next check-in.`,
           severity: 'low'
-        });
-      }
-    }
+        }
+      ],
+      correlation: 'Establishing academic benchmark.',
+      recommendations: [
+        'Log your next journal entry after tomorrow\'s revision session',
+        'Use the Thought Reframer Sandbox to check self-defeating comments'
+      ]
+    };
   }
 
-  // Cycles
-  if (mockTrigCount >= Math.ceil(logs.length * 0.4)) {
-    patterns.push({
-      title: 'Mock-Test Stress Cycle',
-      description: 'Stress levels spike in association with preparation mock scores and reviews.',
-      severity: avgStress > 65 ? 'high' : 'medium'
-    });
-    recommendations.push('Aura suggests setting a post-exam decompression timer: no feedback review for 20 minutes.');
-  }
+  const sum = history.reduce((acc, curr) => acc + (curr.analysis?.stressScore || 40), 0);
+  const avg = Math.round(sum / history.length);
+  const diff = curStress - avg;
 
-  if (lateNightCount >= Math.ceil(logs.length * 0.4) || sleepTrigCount >= Math.ceil(logs.length * 0.35)) {
-    patterns.push({
-      title: 'Late-Night Exhaustion Risk',
-      description: 'Frequent logs occur after 10 PM. Physical tiredness is impacting cognitive processing.',
+  const patternsList = [];
+  let severity = 'low';
+
+  if (diff >= 15) {
+    severity = 'high';
+    patternsList.push({
+      title: 'Acute Stress Escalation Detected',
+      description: `Current stress is ${diff} points higher than your history average of ${avg}. High-stakes triggers are active.`,
       severity: 'high'
     });
-    recommendations.push('Create a strict 10:30 PM books-closed threshold. Rest is an active prep step.');
-  }
-
-  if (peerTrigCount >= Math.ceil(logs.length * 0.35)) {
-    patterns.push({
-      title: 'Social Benchmarking Distress',
-      description: 'Anxiety fluctuates when relative peer rankings and WhatsApp study groups are active.',
-      severity: 'medium'
-    });
-    recommendations.push('Mute prep discussion forums for 48 hours. Focus only on personal improvement metrics.');
-  }
-
-  if (patterns.length === 0) {
-    patterns.push({
-      title: 'Stable Study Progress',
-      description: 'Your baseline stress rates are matching steady pacing of your syllabus revision.',
+  } else if (diff <= -10) {
+    patternsList.push({
+      title: 'Positive Stress Reduction Trend',
+      description: `Wellness is improving! Stress is ${Math.abs(diff)} points lower than your average of ${avg}.`,
       severity: 'low'
     });
-    recommendations.push('Continue with the current balance. Add 5-minute movement sessions during subject breaks.');
+  } else {
+    patternsList.push({
+      title: 'Stable Preparation Load Pacing',
+      description: `Stress remains balanced around your baseline of ${avg} (current: ${curStress}). Pacing is sustainable.`,
+      severity: 'medium'
+    });
   }
 
-  let correlation = `Baseline averages are matching standard preparation timelines. Avg Stress: ${avgStress}/100.`;
-  if (mockTrigCount > sleepTrigCount) {
-    correlation = `Stress peaks show high correlation with mock test releases and syllabus evaluation points.`;
-  } else if (sleepTrigCount > mockTrigCount) {
-    correlation = `Primary stress factor is physical tiredness and late study hours. Cognitive recall will deteriorate.`;
+  // Check for specific repeating triggers in history
+  const sleepDeficits = logs.filter(l => l.analysis?.hiddenStressTriggers?.some(t => t.includes('Sleep'))).length;
+  if (sleepDeficits >= 2) {
+    patternsList.push({
+      title: 'Repeating Sleep Deficit Patterns',
+      description: 'Multiple logs flag fatigue warnings. Study efficiency drops when sleep is restricted.',
+      severity: 'high'
+    });
   }
 
   return {
-    patterns,
-    correlation,
-    recommendations
+    patterns: patternsList,
+    correlation: `Study stress holds stable at ${curStress}/100. Triggers relate to competitive ${examName} syllabus pacing.`,
+    recommendations: [
+      'Balance high-intensity revision with 10-minute soundscapes',
+      'If stress delta is high, engage Box Breathing prior to mock tests'
+    ]
   };
 }
 
 /**
  * Smart Offline Weekly Report Compiler
  */
-function simulateWeeklyReport(logs, userProfile) {
+export function simulateWeeklyReport(logs, userProfile) {
   if (!logs || logs.length === 0) {
     return {
-      avgMood: 'Calm',
+      avgMood: 'No Logs',
       avgStress: 0,
-      avgSleep: 7,
-      avgStudyHours: userProfile?.studyHours || 8,
-      topTrigger: 'Syllabus Revision Loading',
+      avgSleep: 7.0,
+      avgStudyHours: userProfile.studyHours || 8,
+      topTrigger: 'None',
       burnoutTrend: 'stable',
-      achievements: ['Initialized ZenStudy wellness tracker'],
-      areasToImprove: ['Log daily reflections after study sessions'],
-      recommendation: 'Aura recommendations will populate as soon as you record study reflections.',
-      motivationalMessage: 'You are embarking on a major goal. Step by step, you are constructing your capabilities.'
+      achievements: ['Initialized Profile Settings'],
+      areasToImprove: ['Complete daily journal entries'],
+      recommendation: 'Register study reflection entries regularly to unlock comprehensive weekly metric reports.',
+      motivationalMessage: 'Every step counts. Pacing your study targets consistently is the key to cracking competitive entrance exams.'
     };
   }
 
-  let totalStress = 0;
-  let totalWellness = 0;
-  let totalStudy = 0;
-  let mockCount = 0;
-  let sleepCount = 0;
-  let peerCount = 0;
-
-  logs.forEach(log => {
-    const a = log.analysis || {};
-    totalStress += (a.stressScore || 40);
-    totalWellness += (a.wellnessScore || 50);
-    totalStudy += (userProfile?.studyHours || 8);
-    
-    const trigs = a.hiddenStressTriggers || [];
-    if (trigs.some(t => t.includes('Mock'))) mockCount++;
-    if (trigs.some(t => t.includes('Sleep'))) sleepCount++;
-    if (trigs.some(t => t.includes('Peer'))) peerCount++;
-  });
-
-  const avgStress = Math.round(totalStress / logs.length);
-  const avgWellness = Math.round(totalWellness / logs.length);
-  const avgStudyHours = Math.round(totalStudy / logs.length);
+  const sumStress = logs.reduce((acc, curr) => acc + (curr.analysis?.stressScore || 40), 0);
+  const avgStress = Math.round(sumStress / logs.length);
   
-  // Simulated sleep hours based on sleep alerts
-  const avgSleep = sleepCount > logs.length * 0.4 ? 5.8 : 7.2;
+  const moods = logs.map(l => l.analysis?.primaryEmotion || 'Steady');
+  const moodCounts = {};
+  moods.forEach(m => moodCounts[m] = (moodCounts[m] || 0) + 1);
+  const topMood = Object.keys(moodCounts).reduce((a, b) => moodCounts[a] > moodCounts[b] ? a : b);
 
-  // Determine top trigger
-  let topTrigger = 'General Study Load';
-  if (mockCount >= sleepCount && mockCount >= peerCount) {
-    topTrigger = 'Mock Exam Performance';
-  } else if (sleepCount > mockCount) {
-    topTrigger = 'Sleep Deficit & Physical Burnout';
-  } else if (peerCount > 0) {
-    topTrigger = 'Peer Comparison Pressure';
-  }
-
-  // Burnout trend
-  let burnoutTrend = 'stable';
-  if (avgStress > 70) burnoutTrend = 'worsening';
-  else if (avgStress < 40) burnoutTrend = 'improving';
-
-  const achievements = [];
-  achievements.push(`Completed ${logs.length} mindful journals this week`);
-  if (avgStress < 50) achievements.push('Maintained a balanced stress state');
-  if (avgSleep >= 7) achievements.push('Prioritized physical recovery sleep');
-
-  const areasToImprove = [];
-  if (sleepCount > 0) areasToImprove.push('Enforce books-closed boundary 30 mins before sleep');
-  if (mockCount > 0) areasToImprove.push('Focus on mistake mapping instead of mocking grades');
-  if (areasToImprove.length === 0) areasToImprove.push('Maintain current study/life recovery balance');
-
-  let recommendation = `Maintain your current Pomodoro blocks. `;
-  if (burnoutTrend === 'worsening') {
-    recommendation += `Enforce a strict 1-hour digital disconnect post mock test. Take a 15-minute walking break before evaluating answers.`;
-  } else {
-    recommendation += `Add a 2-minute box breathing cycle before launching tough subject study slots.`;
-  }
-
-  const avgMood = avgWellness > 75 ? 'Optimistic' : avgWellness > 50 ? 'Steady' : 'Overwhelmed';
+  const triggers = logs.flatMap(l => l.analysis?.hiddenStressTriggers || []);
+  const triggerCounts = {};
+  triggers.forEach(t => triggerCounts[t] = (triggerCounts[t] || 0) + 1);
+  const topTrigger = triggers.length > 0 
+    ? Object.keys(triggerCounts).reduce((a, b) => triggerCounts[a] > triggerCounts[b] ? a : b)
+    : 'General Preparation Load';
 
   return {
-    avgMood,
-    avgStress,
-    avgSleep,
-    avgStudyHours,
-    topTrigger,
-    burnoutTrend,
-    achievements,
-    areasToImprove,
-    recommendation,
-    motivationalMessage: `Excellent commitment this week, ${userProfile?.name || 'Student'}. Naviagting ${userProfile?.exam || 'competitive exams'} is a cognitive marathon, and by monitoring your mental health you are building long-term resilience.`
+    avgMood: topMood,
+    avgStress: avgStress,
+    avgSleep: triggers.some(t => t.includes('Sleep')) ? 5.8 : 7.2,
+    avgStudyHours: userProfile.studyHours || 8,
+    topTrigger: topTrigger,
+    burnoutTrend: avgStress > 70 ? 'worsening' : avgStress > 45 ? 'stable' : 'improving',
+    achievements: [
+      'Maintained consistent revision check-ins',
+      'Prioritized daily wellness self-reflections'
+    ],
+    areasToImprove: [
+      'Reduce screen time before sleeping',
+      'Increase downtime breaks during mock tests'
+    ],
+    recommendation: avgStress > 60 
+      ? 'High preparation load detected. Aura recommends capping study hours at 8 hrs/day and inserting a structured walk block.'
+      : 'Wellness indicators look balanced. Keep up this study pacing and maintain consistent rest routines.',
+    motivationalMessage: 'Success is not final, failure is not fatal: it is the courage to continue that counts. Keep going!'
   };
+}
+
+// Robust timeout wrapper helper
+function withTimeout(promise, timeoutMs) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error('Gemini API call timed out'));
+    }, timeoutMs);
+    promise
+      .then((res) => {
+        clearTimeout(timer);
+        resolve(res);
+      })
+      .catch((err) => {
+        clearTimeout(timer);
+        reject(err);
+      });
+  });
+}
+
+// Robust retry wrapper helper
+async function fetchWithRetry(fn, retries = 2, timeoutMs = 8000) {
+  let lastErr = null;
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await withTimeout(fn(), timeoutMs);
+    } catch (err) {
+      lastErr = err;
+    }
+  }
+  throw lastErr;
 }
 
 /**
@@ -368,7 +316,7 @@ export class GeminiService {
       try {
         this.ai = new GoogleGenerativeAI(apiKey);
       } catch (err) {
-        console.error('Failed to initialize GoogleGenerativeAI SDK:', err);
+        // Suppress console alerts
       }
     }
   }
@@ -421,7 +369,8 @@ export class GeminiService {
         generationConfig: { responseMimeType: 'application/json' }
       });
 
-      const result = await model.generateContent(prompt);
+      // Fetch with timeout and retry robustness policies
+      const result = await fetchWithRetry(() => model.generateContent(prompt), 2, 8000);
       const response = await result.response;
       const responseText = response.text();
       
@@ -445,7 +394,6 @@ export class GeminiService {
 
       return parsed;
     } catch (error) {
-      console.error('Gemini 18-Field Analysis failed, falling back to simulator:', error);
       return simulateJournalAnalysis(text, examName);
     }
   }
@@ -507,12 +455,12 @@ Motivation: ${log.analysis?.motivation || 50}/100
         generationConfig: { responseMimeType: 'application/json' }
       });
 
-      const result = await model.generateContent(prompt);
+      // Fetch with timeout and retry robustness policies
+      const result = await fetchWithRetry(() => model.generateContent(prompt), 2, 8000);
       const response = await result.response;
       const responseText = response.text();
       return JSON.parse(responseText);
     } catch (error) {
-      console.error('Gemini Pattern Detection failed, falling back to simulator:', error);
       return simulateStressPatterns(logs, currentLog, examName);
     }
   }
@@ -565,12 +513,12 @@ Triggers: ${(log.analysis?.hiddenStressTriggers || []).join(', ')}
         generationConfig: { responseMimeType: 'application/json' }
       });
 
-      const result = await model.generateContent(prompt);
+      // Fetch with timeout and retry robustness policies
+      const result = await fetchWithRetry(() => model.generateContent(prompt), 2, 8000);
       const response = await result.response;
       const responseText = response.text();
       return JSON.parse(responseText);
     } catch (error) {
-      console.error('Gemini Weekly Report generator failed, falling back to simulator:', error);
       return simulateWeeklyReport(logs, userProfile);
     }
   }
@@ -580,7 +528,6 @@ Triggers: ${(log.analysis?.hiddenStressTriggers || []).join(', ')}
    */
   async talkToAura(chatHistory, userMessage, examName = 'Exams', studentName = 'Student', logs = [], patterns = null) {
     if (!this.ai) {
-      // Enhanced simulated conversation incorporating last journal memory context
       return new Promise((resolve) => {
         setTimeout(() => {
           const normalized = userMessage.toLowerCase();
@@ -593,25 +540,15 @@ Triggers: ${(log.analysis?.hiddenStressTriggers || []).join(', ')}
           }
 
           let fallbacks = [
-            `I hear you, ${studentName}. Navigating UPSC/entrance prep is a marathon, and carrying this pressure alone is exhausting. What is occupying your thoughts right now?`,
+            `I hear you, ${studentName}. Navigating ${examName} prep is a marathon, and carrying this pressure alone is exhausting. What is occupying your thoughts right now?`,
             `Venting helps clear cognitive RAM, ${studentName}. Knowing you had ${lastJournalTrig} in your recent log, how are you pacing yourself today?`,
             `I completely understand. ${examName} prep often induces comparison anxiety. Since your stress score is currently hovering around ${lastStress}/100, what brief resting block can we add today?`,
             `That's a lot to carry, ${studentName}. When we are constantly testing under timed mock conditions, our brains enter a fight-or-flight state. Tell me, what subject backlog is feeling like the biggest hurdle today?`
           ];
 
-          if (examName === 'UPSC') {
-            fallbacks = [
-              `I hear you, ${studentName}. UPSC GS papers, Optionals, and CSAT are extremely heavy. Knowing you logged worries about ${lastJournalTrig} recently, how is your study schedule holding up today?`,
-              `Venting about prelims/mains pressure is important, ${studentName}. Your current stress rating is ${lastStress}/100. How are you balancing GS static subjects with answer writing reviews?`,
-              `I completely understand. UPSC self-doubt is real. If you could pause reading newspapers or optionals for just 5 minutes, what would feel most relaxing?`,
-              `UPSC requires immense consistency, but rest is part of preparation. What GS or optional backlog is causing you the most focus slip today?`
-            ];
-          }
-
           const index = Math.floor(chatHistory.length / 2) % fallbacks.length;
           let reply = fallbacks[index];
 
-          // Contextual keywords mapping
           if (normalized.includes('anxious') || normalized.includes('scared') || normalized.includes('nervous') || normalized.includes('fear') || normalized.includes('worry') || normalized.includes('panic')) {
             reply = `Mock testing or revision deadlines can trigger intense survival reflexes in the brain, ${studentName}. That anxiety is your mind trying to protect your goals, but it is overloading you. Let's try the 4-4-4-4 Box Breathing exercise under Mindfulness, or break your next syllabus block into a 20-minute target. What sounds better?`;
           } else if (normalized.includes('tired') || normalized.includes('sleep') || normalized.includes('exhausted') || normalized.includes('sleepy') || normalized.includes('fatigue') || normalized.includes('burnout')) {
@@ -632,7 +569,6 @@ Triggers: ${(log.analysis?.hiddenStressTriggers || []).join(', ')}
     }
 
     try {
-      // Compile Memory Context
       const lastLog = logs && logs.length > 0 ? logs[0] : null;
       const lastText = lastLog ? lastLog.text : 'None';
       const lastStress = lastLog ? lastLog.analysis?.stressScore : 40;
@@ -664,13 +600,13 @@ Triggers: ${(log.analysis?.hiddenStressTriggers || []).join(', ')}
       const prompt = `${systemInstruction}\n\nChat history:\n${chatHistory.map(h => `${h.sender === 'user' ? 'Student' : 'Aura'}: ${h.text}`).join('\n')}\nStudent: ${userMessage}\nAura:`;
 
       const model = this.ai.getGenerativeModel({ model: 'gemini-2.5-flash' });
-      const result = await model.generateContent(prompt);
+      // Fetch with timeout and retry robustness policies
+      const result = await fetchWithRetry(() => model.generateContent(prompt), 2, 8000);
       const response = await result.response;
       return response.text();
     } catch (error) {
-      console.error('Aura Chat memory call failed, falling back to simulator:', error);
       return new Promise((resolve) => {
-        resolve(`I'm listening, ${studentName}. Take a slow deep breath. UPSC/entrance prep can feel like a heavy weight, but let's take it one concept at a time. What topic are you working on today?`);
+        resolve(`I'm listening, ${studentName}. Take a slow deep breath. ${examName} prep can feel like a heavy weight, but let's take it one concept at a time. What topic are you working on today?`);
       });
     }
   }

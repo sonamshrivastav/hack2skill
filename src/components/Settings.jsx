@@ -24,6 +24,11 @@ export default function Settings({ user, apiKey, onSaveSettings, onClearData }) 
     if (!emergencyName.trim()) return setStatus('Emergency contact name cannot be empty.');
     if (!emergencyPhone.trim()) return setStatus('Emergency contact phone cannot be empty.');
 
+    const phoneRegex = /^[+]?[0-9\s\-()]{8,20}$/;
+    if (!phoneRegex.test(emergencyPhone.trim())) {
+      return setStatus('Please enter a valid emergency contact phone details (at least 8 digits).');
+    }
+
     onSaveSettings({
       user: {
         name: name.trim(),
