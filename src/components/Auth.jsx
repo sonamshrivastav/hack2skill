@@ -42,7 +42,29 @@ export default function Auth({ onAuthSuccess }) {
   const getUsersDB = () => {
     try {
       const db = localStorage.getItem('zenstudy_users_db');
-      return db ? JSON.parse(db) : [];
+      const parsed = db ? JSON.parse(db) : [];
+      
+      // Seed default dummy account for hackathon evaluators if db is empty
+      if (parsed.length === 0) {
+        const dummyUser = {
+          name: 'Zen Student',
+          email: 'student@zenstudy.com',
+          // Hashed version of 'password123'
+          password: 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f',
+          exam: 'UPSC',
+          examDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          studyHours: 8,
+          emergencyContact: {
+            name: 'Counselor Support',
+            relationship: 'Guardian',
+            phone: '+1 (555) 019-2834',
+            consent: true
+          }
+        };
+        parsed.push(dummyUser);
+        localStorage.setItem('zenstudy_users_db', JSON.stringify(parsed));
+      }
+      return parsed;
     } catch (e) {
       return [];
     }
@@ -438,6 +460,21 @@ export default function Auth({ onAuthSuccess }) {
                   onFocus={(e) => e.target.style.borderColor = 'var(--color-accent-teal)'}
                   onBlur={(e) => e.target.style.borderColor = 'var(--border-glow)'}
                 />
+              </div>
+
+              {/* Hackathon Evaluator login assistance note */}
+              <div style={{
+                fontSize: '0.78rem',
+                color: 'var(--color-accent-amber)',
+                background: 'rgba(245, 158, 11, 0.08)',
+                border: '1px solid rgba(245, 158, 11, 0.15)',
+                padding: '10px 12px',
+                borderRadius: '8px',
+                textAlign: 'center',
+                lineHeight: '1.4'
+              }}>
+                💡 <strong>Evaluator Login:</strong> student@zenstudy.com <br/>
+                <strong>Password:</strong> password123
               </div>
 
               <button type="submit" className="btn-primary" style={{
