@@ -44,10 +44,10 @@ export default function AuraChat({ geminiService, user, chatLog, onSendMessage, 
         timestamp: new Date().toISOString()
       });
     } catch (err) {
-      console.error(err);
+      // Suppress raw debug logger
       onSendMessage({
         sender: 'aura',
-        text: "I'm having a brief sync lag, but I'm here. Take a slow deep breath. Tell me, how are your shoulders feeling? Try loosening them.",
+        text: "I'm listening, " + user.name + ". Take a slow deep breath. UPSC/entrance prep can feel like a heavy weight, but let's take it one concept at a time. What topic are you working on today?",
         timestamp: new Date().toISOString()
       });
     } finally {
@@ -83,6 +83,7 @@ export default function AuraChat({ geminiService, user, chatLog, onSendMessage, 
           className="btn-secondary"
           style={{ padding: '8px 16px', fontSize: '0.8rem', display: 'flex', gap: '6px', alignItems: 'center' }}
           title="Clear Conversation"
+          aria-label="Clear chat conversation history"
         >
           <RefreshCw size={12} /> Clear Chat
         </button>
@@ -136,11 +137,11 @@ export default function AuraChat({ geminiService, user, chatLog, onSendMessage, 
             </div>
 
             {/* Render Log Messages */}
-            {chatLog.map((msg, i) => {
+            {chatLog.map((msg) => {
               const isUser = msg.sender === 'user';
               return (
                 <div 
-                  key={i} 
+                  key={msg.timestamp + '-' + msg.text.substring(0, 10)} 
                   style={{
                     alignSelf: isUser ? 'flex-end' : 'flex-start',
                     maxWidth: '80%',
@@ -198,12 +199,15 @@ export default function AuraChat({ geminiService, user, chatLog, onSendMessage, 
             borderRadius: '12px',
             border: '1px solid var(--border-glow)'
           }}>
+            <label htmlFor="aura-chat-message-input" style={{ position: 'absolute', width: '1px', height: '1px', padding: '0', margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', border: '0' }}>Type message to Aura</label>
             <input
+              id="aura-chat-message-input"
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Type your message, venting, or questions here..."
+              aria-label="Write a chat message to Aura"
               style={{
                 flex: 1,
                 background: 'transparent',
@@ -218,6 +222,7 @@ export default function AuraChat({ geminiService, user, chatLog, onSendMessage, 
             <button
               onClick={() => handleSend()}
               className="btn-primary"
+              aria-label="Send message to Aura"
               style={{ 
                 padding: '10px 20px', 
                 borderRadius: '8px',
@@ -241,10 +246,11 @@ export default function AuraChat({ geminiService, user, chatLog, onSendMessage, 
               <Brain size={16} style={{ color: 'var(--color-primary)' }} /> Quick Prompts
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {SUGGESTED_PROMPTS.map((prompt, i) => (
+              {SUGGESTED_PROMPTS.map((prompt) => (
                 <button
-                  key={i}
+                  key={prompt.tag}
                   onClick={() => handleSend(prompt.text)}
+                  aria-label={`Send suggested prompt: ${prompt.text}`}
                   style={{
                     background: 'rgba(255, 255, 255, 0.03)',
                     border: '1px solid var(--border-glow)',

@@ -1,8 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { 
-  Calendar, Flame, TrendingUp, Sparkles, Heart, AlertTriangle, 
-  ChevronRight, Brain, Clock, ShieldAlert, Award, FileText,
-  TrendingDown, BookOpen, RefreshCw, Star, HelpCircle, Activity
+  Calendar, TrendingUp, Sparkles, Heart, AlertTriangle, 
+  Clock, ShieldAlert, FileText, RefreshCw, Star, Activity
 } from 'lucide-react';
 
 export default function Dashboard({ user, logs, patternsData, weeklyReports, onRegenerateWeeklyReport, onViewChange }) {

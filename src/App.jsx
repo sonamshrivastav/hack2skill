@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
   LayoutDashboard, PenTool, MessageSquare, Wind, 
-  Settings, Brain, Sparkles, ShieldAlert, Award, FileText,
-  Volume2, Heart, AlertOctagon, RefreshCw, X, Check, LogOut
+  Settings, Brain, ShieldAlert, Heart, RefreshCw, Check, LogOut
 } from 'lucide-react';
 import Auth from './components/Auth';
 import Dashboard from './components/Dashboard';

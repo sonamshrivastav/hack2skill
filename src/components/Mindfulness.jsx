@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Play, Pause, Volume2, Wind, ShieldCheck, 
-  Trash2, BrainCircuit, Sparkles, VolumeX
+  Play, Pause, Volume2, Wind, 
+  BrainCircuit, Sparkles
 } from 'lucide-react';
 
 export default function Mindfulness({ geminiService, user }) {
@@ -123,7 +123,7 @@ export default function Mindfulness({ geminiService, user }) {
       
       // Prevent Audio Context memory leaks
       if (audioCtx) {
-        audioCtx.close().catch(err => console.error('AudioContext close failed:', err));
+        audioCtx.close().catch(() => {});
       }
     };
   }, [audioCtx]);
@@ -259,22 +259,23 @@ export default function Mindfulness({ geminiService, user }) {
         const res = await model;
         setReframedThought(res.text());
       } else {
-        setTimeout(() => {
-          const lower = negativeThought.toLowerCase();
-          let reframed = "This is a challenging path, but my capabilities grow with effort. A single exam score does not define my future potential.";
-          
-          if (lower.includes('fail')) {
-            reframed = "Mock papers and exams are measures of preparation areas, not of my core capability. Even if I struggle, I can learn, pivot, and succeed in life.";
-          } else if (lower.includes('compare') || lower.includes('better') || lower.includes('behind')) {
-            reframed = "I am running my own race. Comparing my step 10 to someone else's step 50 is unfair. I will focus only on improving my daily revision targets.";
-          } else if (lower.includes('tired') || lower.includes('give up') || lower.includes('cannot do')) {
-            reframed = "Mental tiredness is a message to take rest, not to quit. Taking a break is part of strategic exam success, and I will resume with fresh energy.";
-          }
-          setReframedThought(reframed);
-        }, 1000);
+        await new Promise((resolve) => {
+          setTimeout(() => {
+            const lower = negativeThought.toLowerCase();
+            let reframed = "This is a challenging path, but my capabilities grow with effort. A single exam score does not define my future potential.";
+            
+            if (lower.includes('fail')) {
+              reframed = "Mock papers and exams are measures of preparation areas, not of my core capability. Even if I struggle, I can learn, pivot, and succeed in life.";
+            } else if (lower.includes('compare') || lower.includes('better') || lower.includes('behind')) {
+              reframed = "I am running my own race. Comparing my step 10 to someone else's step 50 is unfair. I will focus only on improving my daily revision targets.";
+            } else if (lower.includes('tired') || lower.includes('give up') || lower.includes('cannot do')) {
+              reframed = "Mental tiredness is a message to take rest, not to quit. Taking a break is part of strategic exam success, and I will resume with fresh energy.";
+            }
+            resolve(reframed);
+          }, 1000);
+        }).then(res => setReframedThought(res));
       }
     } catch(err) {
-      console.error(err);
       setReframedThought("I can take this one step at a time. Difficult concepts take practice, and my persistence will help me figure them out.");
     } finally {
       setIsReframing(false);
@@ -316,22 +317,25 @@ export default function Mindfulness({ geminiService, user }) {
             height: '200px',
             width: '100%'
           }}>
-            <div style={{
-              width: '100px',
-              height: '100px',
-              borderRadius: '50%',
-              background: getCircleColor(),
-              boxShadow: `0 0 30px ${getCircleColor()}`,
-              transform: `scale(${getCircleScale()})`,
-              transition: 'transform 4s linear, background-color 1s ease',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#fff',
-              fontWeight: 'bold',
-              textShadow: '0 2px 4px rgba(0,0,0,0.5)'
-            }}>
+            <div 
+              aria-live="polite"
+              style={{
+                width: '100px',
+                height: '100px',
+                borderRadius: '50%',
+                background: getCircleColor(),
+                boxShadow: `0 0 30px ${getCircleColor()}`,
+                transform: `scale(${getCircleScale()})`,
+                transition: 'transform 4s linear, background-color 1s ease',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#fff',
+                fontWeight: 'bold',
+                textShadow: '0 2px 4px rgba(0,0,0,0.5)'
+              }}
+            >
               <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 {breatheState === 'PAUSED' ? 'Ready' : breatheTimer}
               </span>
@@ -348,6 +352,7 @@ export default function Mindfulness({ geminiService, user }) {
           <button 
             onClick={toggleBreathing} 
             className="btn-primary" 
+            aria-label={breatheState !== 'PAUSED' ? "Pause Box Breathing cycle" : "Start Box Breathing cycle"}
             style={{ 
               borderRadius: '50px', 
               padding: '12px 30px',
@@ -387,6 +392,7 @@ export default function Mindfulness({ geminiService, user }) {
                 </div>
                 <button 
                   onClick={toggleBinaural} 
+                  aria-label={binauralActive ? "Stop Binaural Beats Alpha Wave generator" : "Start Binaural Beats Alpha Wave generator"}
                   style={{
                     padding: '8px 16px',
                     borderRadius: '8px',
@@ -419,6 +425,7 @@ export default function Mindfulness({ geminiService, user }) {
                 </div>
                 <button 
                   onClick={toggleBrownNoise} 
+                  aria-label={brownNoiseActive ? "Stop Synthesized Brown Noise generator" : "Start Synthesized Brown Noise generator"}
                   style={{
                     padding: '8px 16px',
                     borderRadius: '8px',
@@ -480,7 +487,7 @@ export default function Mindfulness({ geminiService, user }) {
           
           {/* Input side */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <label htmlFor="mindfulness-reframer-input" style={{ display: 'none' }}>Self defeating thoughts</label>
+            <label htmlFor="mindfulness-reframer-input" style={{ position: 'absolute', width: '1px', height: '1px', padding: '0', margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', border: '0' }}>Self defeating thoughts</label>
             <textarea
               id="mindfulness-reframer-input"
               value={negativeThought}
@@ -503,6 +510,7 @@ export default function Mindfulness({ geminiService, user }) {
             <button
               onClick={handleReframing}
               className="btn-primary"
+              aria-label="Filter and reframe negative thoughts"
               style={{ 
                 alignSelf: 'flex-start',
                 padding: '8px 18px',

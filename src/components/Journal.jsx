@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { 
-  PenTool, Brain, Sparkles, AlertCircle, Calendar, 
-  Smile, ShieldCheck, CheckCircle2, ChevronRight, Loader2,
-  Frown, Compass, Star, Zap, Eye, RefreshCw
+  PenTool, Brain, Sparkles, AlertCircle, 
+  Smile, CheckCircle2, Loader2, Zap
 } from 'lucide-react';
 
 const WRITING_PROMPTS = [
@@ -55,7 +54,6 @@ export default function Journal({ geminiService, user, onLogAdded, onCheckDistre
 
       setStatusMessage('Reflection log analyzed and saved successfully!');
     } catch (err) {
-      console.error(err);
       setStatusMessage('Failed to complete AI review. Please check your credentials or try again.');
     } finally {
       setIsAnalyzing(false);
@@ -112,6 +110,7 @@ export default function Journal({ geminiService, user, onLogAdded, onCheckDistre
             </div>
             <button 
               onClick={handleNextPrompt}
+              aria-label="Get next journaling prompt suggestion"
               style={{
                 background: 'rgba(255, 255, 255, 0.05)',
                 border: 'none',
@@ -132,10 +131,13 @@ export default function Journal({ geminiService, user, onLogAdded, onCheckDistre
 
           {/* Text Editor */}
           <div style={{ position: 'relative' }}>
+            <label htmlFor="journal-editor-text" style={{ position: 'absolute', width: '1px', height: '1px', padding: '0', margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', border: '0' }}>Type study reflections here</label>
             <textarea
+              id="journal-editor-text"
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="Start typing your study logs, worries, mock exam concerns, or daily recap here..."
+              aria-label="Write study reflections"
               style={{
                 width: '100%',
                 height: '280px',
@@ -171,6 +173,7 @@ export default function Journal({ geminiService, user, onLogAdded, onCheckDistre
             <button 
               onClick={handleClear}
               className="btn-secondary"
+              aria-label="Clear all text from journal editor"
               style={{ padding: '10px 20px', fontSize: '0.9rem' }}
               disabled={isAnalyzing || !text}
             >
@@ -180,6 +183,7 @@ export default function Journal({ geminiService, user, onLogAdded, onCheckDistre
             <button
               onClick={handleAnalyze}
               className="btn-primary"
+              aria-label="Analyze journal entry sentiment and save to history"
               style={{ 
                 padding: '10px 24px', 
                 fontSize: '0.95rem',
@@ -357,8 +361,8 @@ export default function Journal({ geminiService, user, onLogAdded, onCheckDistre
                   <div style={{ background: 'rgba(20, 184, 166, 0.03)', border: '1px solid rgba(20, 184, 166, 0.15)', padding: '12px', borderRadius: '8px' }}>
                     <span style={{ fontSize: '0.72rem', color: 'var(--color-accent-teal)', fontWeight: 'bold', display: 'block', marginBottom: '6px' }}>POSSITIVE HABITS</span>
                     <ul style={{ listStyleType: 'none', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      {analysisResult.positiveHabits.map((h, i) => (
-                        <li key={i} style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>✓ {h}</li>
+                      {analysisResult.positiveHabits.map((h) => (
+                        <li key={h} style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>✓ {h}</li>
                       ))}
                     </ul>
                   </div>
@@ -366,8 +370,8 @@ export default function Journal({ geminiService, user, onLogAdded, onCheckDistre
                   <div style={{ background: 'rgba(244, 63, 94, 0.03)', border: '1px solid rgba(244, 63, 94, 0.15)', padding: '12px', borderRadius: '8px' }}>
                     <span style={{ fontSize: '0.72rem', color: 'var(--color-accent-rose)', fontWeight: 'bold', display: 'block', marginBottom: '6px' }}>BURN OVER WARNINGS</span>
                     <ul style={{ listStyleType: 'none', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      {analysisResult.negativeHabits.map((h, i) => (
-                        <li key={i} style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>• {h}</li>
+                      {analysisResult.negativeHabits.map((h) => (
+                        <li key={h} style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>• {h}</li>
                       ))}
                     </ul>
                   </div>
@@ -387,8 +391,8 @@ export default function Journal({ geminiService, user, onLogAdded, onCheckDistre
                 <div>
                   <h4 style={{ fontSize: '0.78rem', color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '8px' }}>Coping Strategies</h4>
                   <ul style={{ listStyleType: 'none', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    {analysisResult.copingStrategies.map((rec, i) => (
-                      <li key={i} style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', gap: '8px' }}>
+                    {analysisResult.copingStrategies.map((rec) => (
+                      <li key={rec} style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', gap: '8px' }}>
                         <span style={{ color: 'var(--color-accent-teal)' }}>✓</span>
                         {rec}
                       </li>
