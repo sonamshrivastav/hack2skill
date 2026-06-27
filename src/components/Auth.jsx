@@ -60,7 +60,17 @@ export default function Auth({ onAuthSuccess }) {
     }
   };
 
-  const handleSignIn = (e) => {
+  // Web Crypto API SHA-256 Hashing helper
+  const sha256 = async (message) => {
+    if (message === 'google-oauth-dummy-pw') return message;
+    const msgBuffer = new TextEncoder().encode(message);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+  };
+
+  const handleSignIn = async (e) => {
     e.preventDefault();
     setError('');
     setStatusMessage('');
@@ -74,14 +84,32 @@ export default function Auth({ onAuthSuccess }) {
       u => u.email.toLowerCase() === signInEmail.trim().toLowerCase()
     );
 
-    if (!foundUser || foundUser.password !== signInPassword) {
+    if (!foundUser) {
       return setError('Invalid email credentials or incorrect password.');
+    }
+
+    const hashedInput = await sha256(signInPassword);
+    
+    // Support secure hashing with a clean migration fallback for plain-text accounts
+    const isValid = foundUser.password === hashedInput || foundUser.password === signInPassword;
+    if (!isValid) {
+      return setError('Invalid email credentials or incorrect password.');
+    }
+
+    // Upgrade migration: if old plain-text account, hash it now on login
+    if (foundUser.password === signInPassword && signInPassword !== 'google-oauth-dummy-pw') {
+      try {
+        foundUser.password = hashedInput;
+        const filtered = db.filter(u => u.email.toLowerCase() !== foundUser.email.toLowerCase());
+        filtered.push(foundUser);
+        localStorage.setItem('zenstudy_users_db', JSON.stringify(filtered));
+      } catch (e) {}
     }
 
     onAuthSuccess(foundUser);
   };
 
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -105,10 +133,12 @@ export default function Auth({ onAuthSuccess }) {
       return setError('This email is already registered. Please login.');
     }
 
+    const hashedPassword = await sha256(signUpPassword);
+
     const newUser = {
       name: signUpName.trim(),
       email: signUpEmail.trim().toLowerCase(),
-      password: signUpPassword,
+      password: hashedPassword,
       exam: selectedExam,
       examDate,
       studyHours: parseInt(studyHours) || 8,

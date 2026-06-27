@@ -10,7 +10,7 @@ export default function Settings({ user, apiKey, onSaveSettings, onClearData }) 
   
   // Emergency Contact States
   const [emergencyName, setEmergencyName] = useState(user?.emergencyContact?.name || '');
-  const [emergencyRel, setEmergencyRel] = useState(user?.emergencyContact?.relationship || 'Parent');
+  const [emergencyRel, setEmergencyContactRel] = useState(user?.emergencyContact?.relationship || 'Parent');
   const [emergencyPhone, setEmergencyPhone] = useState(user?.emergencyContact?.phone || '');
   const [emergencyConsent, setEmergencyConsent] = useState(user?.emergencyContact?.consent || false);
 
@@ -69,7 +69,9 @@ export default function Settings({ user, apiKey, onSaveSettings, onClearData }) 
               By default, the wellness application runs in <strong>Offline Simulator Mode</strong>. 
               To activate high-fidelity Generative AI analysis, paste your <strong>Google Gemini API Key</strong> below.
             </p>
+            <label htmlFor="settings-api-key" style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>Gemini API Key</label>
             <input
+              id="settings-api-key"
               type="password"
               value={keyInput}
               onChange={(e) => setKeyInput(e.target.value)}
@@ -101,8 +103,9 @@ export default function Settings({ user, apiKey, onSaveSettings, onClearData }) 
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>Student Name</label>
+                <label htmlFor="settings-name" style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>Student Name</label>
                 <input
+                  id="settings-name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -118,8 +121,9 @@ export default function Settings({ user, apiKey, onSaveSettings, onClearData }) 
               </div>
               
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>Target Entrance Exam</label>
+                <label htmlFor="settings-exam" style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>Target Entrance Exam</label>
                 <select
+                  id="settings-exam"
                   value={exam}
                   onChange={(e) => setExam(e.target.value)}
                   style={{
@@ -141,8 +145,9 @@ export default function Settings({ user, apiKey, onSaveSettings, onClearData }) 
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>Exam Target Date</label>
+                <label htmlFor="settings-exam-date" style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>Exam Target Date</label>
                 <input
+                  id="settings-exam-date"
                   type="date"
                   value={examDate}
                   onChange={(e) => setExamDate(e.target.value)}
@@ -158,8 +163,9 @@ export default function Settings({ user, apiKey, onSaveSettings, onClearData }) 
               </div>
 
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>Daily Study Hours Target</label>
+                <label htmlFor="settings-study-hours" style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>Daily Study Hours Target</label>
                 <input
+                  id="settings-study-hours"
                   type="number"
                   min="1"
                   max="20"
@@ -186,8 +192,9 @@ export default function Settings({ user, apiKey, onSaveSettings, onClearData }) 
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '16px' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>Contact Name</label>
+                <label htmlFor="settings-emergency-name" style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>Contact Name</label>
                 <input
+                  id="settings-emergency-name"
                   type="text"
                   value={emergencyName}
                   onChange={(e) => setEmergencyName(e.target.value)}
@@ -203,10 +210,11 @@ export default function Settings({ user, apiKey, onSaveSettings, onClearData }) 
               </div>
 
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>Relationship</label>
+                <label htmlFor="settings-emergency-rel" style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>Relationship</label>
                 <select
+                  id="settings-emergency-rel"
                   value={emergencyRel}
-                  onChange={(e) => setEmergencyRel(e.target.value)}
+                  onChange={(e) => setEmergencyContactRel(e.target.value)}
                   style={{
                     width: '100%',
                     padding: '10px 14px',
@@ -224,8 +232,9 @@ export default function Settings({ user, apiKey, onSaveSettings, onClearData }) 
               </div>
 
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>Phone Number</label>
+                <label htmlFor="settings-emergency-phone" style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>Phone Number</label>
                 <input
+                  id="settings-emergency-phone"
                   type="text"
                   value={emergencyPhone}
                   onChange={(e) => setEmergencyPhone(e.target.value)}

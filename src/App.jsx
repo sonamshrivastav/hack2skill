@@ -315,7 +315,7 @@ export default function App() {
       <div className="ambient-bg-glow glow-teal" style={{ bottom: '10%', right: '10%' }} />
 
       {/* Navigation Sidebar */}
-      <aside className="sidebar">
+      <aside className="sidebar" role="complementary" aria-label="ZenStudy Sidebar">
         
         {/* Brand Logo Header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px', padding: '0 8px' }}>
@@ -334,10 +334,11 @@ export default function App() {
         </div>
 
         {/* Navigation list */}
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+        <nav aria-label="Sidebar navigation" style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
           <button 
             onClick={() => setActiveView('dashboard')}
             className={`btn-nav ${activeView === 'dashboard' ? 'active' : ''}`}
+            aria-current={activeView === 'dashboard' ? 'page' : undefined}
           >
             <LayoutDashboard size={18} /> Dashboard
           </button>
@@ -345,6 +346,7 @@ export default function App() {
           <button 
             onClick={() => setActiveView('journal')}
             className={`btn-nav ${activeView === 'journal' ? 'active' : ''}`}
+            aria-current={activeView === 'journal' ? 'page' : undefined}
           >
             <PenTool size={18} /> Journaling
           </button>
@@ -352,6 +354,7 @@ export default function App() {
           <button 
             onClick={() => setActiveView('chat')}
             className={`btn-nav ${activeView === 'chat' ? 'active' : ''}`}
+            aria-current={activeView === 'chat' ? 'page' : undefined}
           >
             <MessageSquare size={18} /> Aura Chat
           </button>
@@ -359,6 +362,7 @@ export default function App() {
           <button 
             onClick={() => setActiveView('mindfulness')}
             className={`btn-nav ${activeView === 'mindfulness' ? 'active' : ''}`}
+            aria-current={activeView === 'mindfulness' ? 'page' : undefined}
           >
             <Wind size={18} /> Mindfulness
           </button>
@@ -366,6 +370,7 @@ export default function App() {
           <button 
             onClick={() => setActiveView('settings')}
             className={`btn-nav ${activeView === 'settings' ? 'active' : ''}`}
+            aria-current={activeView === 'settings' ? 'page' : undefined}
           >
             <Settings size={18} /> Settings
           </button>
@@ -430,7 +435,7 @@ export default function App() {
       </aside>
 
       {/* Main Panel Content Window */}
-      <main className="main-content">
+      <main className="main-content" role="main">
         {renderActiveView()}
       </main>
 

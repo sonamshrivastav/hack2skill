@@ -4,7 +4,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
  * Smart Offline 18-Field Journal Analyzer
  * Produces structured wellness metrics based on text keywords.
  */
-function simulateJournalAnalysis(text, examName = 'Exams') {
+export function simulateJournalAnalysis(text, examName = 'Exams') {
   const normalized = text.toLowerCase();
   
   // Base default values
@@ -148,7 +148,7 @@ function simulateJournalAnalysis(text, examName = 'Exams') {
 /**
  * Smart Offline Pattern Detector
  */
-function simulateStressPatterns(logs, currentLog = null, examName = 'Exams') {
+export function simulateStressPatterns(logs, currentLog = null, examName = 'Exams') {
   if (!logs || logs.length === 0) {
     return {
       patterns: [

@@ -320,7 +320,12 @@ export default function Dashboard({ user, logs, patternsData, weeklyReports, onR
               <svg 
                 viewBox={`0 0 ${svgChart.width} ${svgChart.height}`} 
                 style={{ width: '100%', height: 'auto', overflow: 'visible' }}
+                role="img"
+                aria-label="Visual Wellness Analytics Line Chart"
               >
+                <title>Wellness Analytics Trends</title>
+                <desc>Line graph displaying student stress levels, sleep hours, or wellness index scores over the last 7 logged days.</desc>
+                
                 {/* Horizontal guide grids */}
                 <line x1={svgChart.padding} y1={svgChart.padding} x2={svgChart.width - svgChart.padding} y2={svgChart.padding} stroke="hsla(260, 20%, 40%, 0.12)" strokeDasharray="4 4" />
                 <line x1={svgChart.padding} y1={(svgChart.height) / 2} x2={svgChart.width - svgChart.padding} y2={(svgChart.height) / 2} stroke="hsla(260, 20%, 40%, 0.12)" strokeDasharray="4 4" />
@@ -349,7 +354,7 @@ export default function Dashboard({ user, logs, patternsData, weeklyReports, onR
 
                 {/* Nodes */}
                 {svgChart.points.map((pt, i) => (
-                  <g key={i}>
+                  <g key={`${pt.date}-${i}`}>
                     <circle 
                       cx={pt.x} 
                       cy={pt.y} 
@@ -492,8 +497,8 @@ export default function Dashboard({ user, logs, patternsData, weeklyReports, onR
                 <Clock size={16} style={{ color: 'var(--color-accent-teal)' }} /> Cycles & Delta Comparisons
               </h3>
               
-              {patternsData.patterns && patternsData.patterns.map((pt, i) => (
-                <div key={i} className="glass-panel" style={{ padding: '16px', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '12px' }}>
+              {patternsData.patterns && patternsData.patterns.map((pt) => (
+                <div key={pt.title} className="glass-panel" style={{ padding: '16px', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '12px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px', gap: '8px' }}>
                     <h4 style={{ fontSize: '0.95rem', color: '#fff', fontWeight: '600' }}>{pt.title}</h4>
                     {pt.severity === 'high' ? (
@@ -516,8 +521,8 @@ export default function Dashboard({ user, logs, patternsData, weeklyReports, onR
               </h3>
               
               <ul style={{ listStyleType: 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {patternsData.recommendations && patternsData.recommendations.map((rec, i) => (
-                  <li key={i} style={{ 
+                {patternsData.recommendations && patternsData.recommendations.map((rec) => (
+                  <li key={rec} style={{ 
                     fontSize: '0.88rem', 
                     color: 'var(--text-muted)', 
                     lineHeight: '1.45',
@@ -525,7 +530,7 @@ export default function Dashboard({ user, logs, patternsData, weeklyReports, onR
                     paddingLeft: '20px'
                   }}>
                     <span style={{ 
-                      position: 'absolute', 
+                       position: 'absolute', 
                       left: '0', 
                       top: '6px', 
                       width: '6px', 
@@ -631,8 +636,8 @@ export default function Dashboard({ user, logs, patternsData, weeklyReports, onR
                   <Star size={14} style={{ color: 'var(--color-accent-amber)' }} /> Weekly Achievements
                 </h4>
                 <ul style={{ listStyleType: 'none', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {weeklyReports.achievements?.map((ach, idx) => (
-                    <li key={idx} style={{ fontSize: '0.82rem', color: 'var(--text-muted)', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  {weeklyReports.achievements?.map((ach) => (
+                    <li key={ach} style={{ fontSize: '0.82rem', color: 'var(--text-muted)', display: 'flex', gap: '8px', alignItems: 'center' }}>
                       <span style={{ color: 'var(--color-accent-teal)', fontWeight: 'bold' }}>✓</span> {ach}
                     </li>
                   ))}
@@ -645,8 +650,8 @@ export default function Dashboard({ user, logs, patternsData, weeklyReports, onR
                   <AlertTriangle size={14} style={{ color: 'var(--color-accent-rose)' }} /> Focus Action Areas
                 </h4>
                 <ul style={{ listStyleType: 'none', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {weeklyReports.areasToImprove?.map((area, idx) => (
-                    <li key={idx} style={{ fontSize: '0.82rem', color: 'var(--text-muted)', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  {weeklyReports.areasToImprove?.map((area) => (
+                    <li key={area} style={{ fontSize: '0.82rem', color: 'var(--text-muted)', display: 'flex', gap: '8px', alignItems: 'center' }}>
                       <span style={{ color: 'var(--color-accent-rose)' }}>•</span> {area}
                     </li>
                   ))}
