@@ -24,7 +24,7 @@ export async function generateMealPlan(formData) {
     Do NOT wrap the JSON in Markdown code blocks like \`\`\`json. Return raw JSON.
   `;
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
   const response = await fetch(url, {
     method: "POST",
