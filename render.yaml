@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: zenstudy-wellness
+    env: static
+    buildCommand: npm run build
+    publishDir: dist
